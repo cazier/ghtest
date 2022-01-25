@@ -1,0 +1,83 @@
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Create file
+      run: touch file.txt
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifacts
+        path: file.txt
+
+  test-with-continue:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Create file
+      run: touch file-continue.txt
+
+    - name: Run garbage test
+      continue-on-error: true
+      run: cat nonexistent.txt
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifacts
+        path: file-continue.txt
+
+  test-with-failure:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Create file
+      run: touch file-failure.txt
+
+    - name: Run garbage test
+      run: cat nonexistent.txt
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: artifacts
+        path: file-failure.txt
+
+  test-with-all:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Create file
+      run: touch file-all.txt
+
+    - name: Run garbage test
+      run: cat nonexistent.txt
+      continue-on-error: true
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: artifacts
+        path: file-all.txt
+
